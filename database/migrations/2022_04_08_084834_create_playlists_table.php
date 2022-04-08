@@ -16,9 +16,7 @@ return new class extends Migration
         Schema::create('playlists', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->bigInteger('song_id');
-            $table->bigInteger('genre_id');
-            $table->dateTime('creation_time');
+            $table->bigInteger('user_id');
         });
     }
 
