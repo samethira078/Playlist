@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('file_name');
-            $table->string('artist');
-            $table->string('release_date');
+            $table->bigInteger('artist_id');
+            $table->dateTime('release_date');
             $table->bigInteger('genre_id');
         });
     }
