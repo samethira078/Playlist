@@ -21,5 +21,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 });
 
-Route::post('/user/login', [UserController::class, 'user_Login']);
+Route::post('/user/validate', [UserController::class, 'user_Login']);
 Route::post('/user/register', [UserController::class, 'user_register']);
