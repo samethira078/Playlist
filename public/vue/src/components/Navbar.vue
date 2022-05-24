@@ -10,7 +10,7 @@
                     </v-list-item-title>
                     <div>
                         <v-list-item-title class="mt-3">
-                            <v-btn text><v-icon style="color: #5a8f49" large>mdi-login-variant
+                            <v-btn text :to="{name: 'Login'}"><v-icon style="color: #5a8f49" large>mdi-login-variant
                             </v-icon></v-btn>
                             <p class="text-center grey--text">Login</p>
                         </v-list-item-title>
