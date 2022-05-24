@@ -1,19 +1,19 @@
 <template>
       <div>
-          <Header />
-          <Login />
-          <Register />
+          <Header/>
       </div>
 </template>
 
 <script>
 /*Assign components*/
-import Login from "@/components/Login";
-import Register from "@/components/Register";
 import Header from "@/components/Header";
+// import { ref } from "vue"
 export default {
     name: "Home",
-    components: {Login, Register, Header}
+    components: {Header},
+    setup(){
+        // const open = ref(true)
+    }
 }
 </script>
 

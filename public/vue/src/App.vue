@@ -2,7 +2,11 @@
       <v-app>
           <Navbar/>
           <v-main class="grey darken-3">
-              <router-view style="margin-left: 110px"></router-view>
+<!--              <transition mode="out-in"-->
+<!--              enter-active-class="animate__animated animate__fadeIn"-->
+<!--              leave-active-class="animate__animated animate__fadeOut">-->
+                  <router-view style="margin-left: 110px"></router-view>
+<!--              </transition>-->
           </v-main>
       </v-app>
 </template>
