@@ -28,7 +28,7 @@
                 </v-btn>
             </v-card-subtitle>
             <v-card-actions class="justify-center align-center text-center">
-                <v-btn class="" small text>New? Click here</v-btn>
+                <v-btn :to="{name: 'Register'}" class="" small text>New? Click here</v-btn>
             </v-card-actions>
         </v-card>
     </div>
@@ -56,7 +56,16 @@ export default {
             this.$store.dispatch('login', [this.name, this.password]).
             //Correct info
             then(response => {
-               console.log(response)
+                //Check if token is saved in browser storage
+                if(response.token === localStorage.getItem('token')){
+                    //Re-render nav comp
+                    this.$router.push({ name: 'Home' })
+                    this.$emit('changeNavbar');
+                } else {
+                    localStorage.removeItem('token')
+                    this.error[0].status = true;
+                    this.error[0].message = 'Error. Try again!'
+                }
             }).
             catch(response => {
                 //Error
