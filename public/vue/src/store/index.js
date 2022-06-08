@@ -37,6 +37,15 @@ export default new Vuex.Store({
               })
           })
       },
+      getSongs(){
+        return new Promise((resolve, reject) => {
+            axios.get('songs/all').then(response => {
+                resolve(response.data)
+            }).catch(() => {
+                reject(reject)
+            })
+        })
+      },
       register(context, data){
           return new Promise((resolve, reject) => {
               //Post request
