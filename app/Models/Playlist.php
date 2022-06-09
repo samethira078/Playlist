@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Playlist extends Model
 {
     use HasFactory;
+
+    public function playlistsong(){
+        return $this->belongsTo('App\Models\PlaylistSong');
+    }
 }

@@ -27,6 +27,7 @@ export default {
   },
     methods: {
         updateNavbar() {
+            this.$router.go(0);
             this.forceRerender += 1
         }
     }

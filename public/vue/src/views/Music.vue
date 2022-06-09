@@ -93,7 +93,7 @@
             v-model="playlist_dialog"
             class="my-overlay"
         >
-            <playlist v-on:backToMusic="cancelSelectedSong()" :song="song"></playlist>
+            <playlist :key="forceRerender" v-on:backToMusic="cancelSelectedSong()" :song="song"></playlist>
         </v-overlay>
     </div>
 </template>
@@ -157,6 +157,7 @@ export default {
           this.song_info_dialog = !this.song_info_dialog
       },
       moveToPlaylist(song){
+          this.forceRerender += 1;
           this.$emit('addSong', song);
           this.playlist_dialog = !this.playlist_dialog;
           this.artist_dialog =  false;

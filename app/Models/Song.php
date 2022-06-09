@@ -15,4 +15,7 @@ class Song extends Model
     public function genre(){
         return $this->hasOne(Genre::class, 'id', 'genre_id');
     }
+    public function playlistsong(){
+        return $this->belongsTo('App\Models\PlaylistSong');
+    }
 }

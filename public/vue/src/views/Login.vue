@@ -57,8 +57,8 @@ export default {
             //Correct info
             then(response => {
                 //Check if token is saved in browser storage
+                // localStorage.setItem('token', response);
                 if(response.token === localStorage.getItem('token')){
-                    //Re-render nav comp
                     this.$router.push({ name: 'Home' })
                     this.$emit('changeNavbar');
                 } else {

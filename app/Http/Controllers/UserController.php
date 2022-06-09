@@ -42,7 +42,7 @@ class UserController extends Controller
         //Validate login fields
         $field = $request->validate([
             'name' => 'required|string|unique:users,name',
-            'password' => 'required|string'
+            'password' => 'required|string|confirmed',
         ]);
 
         //Create user table
