@@ -96,4 +96,13 @@ class PlaylistController extends Controller
            Playlist::destroy($request->id);
         }
     }
+    public function renamePlaylist(Request $request){
+        echo $request;
+        $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
+            ->where('id', '=', $request->id)
+            ->first();
+        if (!is_null($playlist_exists)) {
+            Playlist::where('id',$request->id)->update(['name'=>$request->name]);
+        }
+    }
 }

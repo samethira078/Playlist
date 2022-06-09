@@ -135,6 +135,7 @@ export default {
         if(num !== 2){
             this.artist_dialog =  true;
             this.songs_dialog = true;
+            this.song = [];
             this.song_info_dialog = true;
         }
 

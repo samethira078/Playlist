@@ -1,5 +1,4 @@
 <template>
-
     <div v-on:addSong="addSong(song)">
         <v-btn @click="create_playlist_dialog = !create_playlist_dialog">
             CREATE PLAYLIST
@@ -17,7 +16,7 @@
                         <v-btn v-if="song" @click="changeName(list.id)" text class="orange--text">
                             Rename
                         </v-btn>
-                        <v-btn v-if="song" @click="addToPlaylist(list.id)" text class="orange--text">
+                        <v-btn v-if="song.name" @click="addToPlaylist(list.id)" text class="orange--text">
                             Add to playlist
                         </v-btn>
                     </v-card-title>
@@ -38,7 +37,7 @@
                 <v-card>
                     <v-card-title>
                         {{list.name}}
-                        <v-btn v-if="song" @click="addToPlaylistTemp(list.id)" text class="orange--text">
+                        <v-btn v-if="song.name" @click="addToPlaylistTemp(list.id)" text class="orange--text">
                             Add to playlist
                         </v-btn>
                     </v-card-title>
@@ -63,10 +62,11 @@
             <template>
                 <v-card v-if="songs_temp_dialog">
                     <v-card-title>
-                        Edit your playlist
+                        Edit your playlist - length: {{total_length}}
                     </v-card-title>
                     <v-card-text>
                         <span v-for="song in songs.songs" :key="song.id">
+
                         <p v-if="remove_song.indexOf(song.song_id) === -1" class="black--text" style="border-bottom: 1px solid black">
                             {{song.name}}
                             {{Math.floor(song.length / 60) + ':' + ('0' + Math.floor(song.length % 60)).slice(-2)}}
@@ -94,7 +94,7 @@
             <template>
                 <v-card v-if="songs_dialog">
                     <v-card-title>
-                        Edit your playlist
+                        Edit your playlist - length: {{total_length}}
                     </v-card-title>
                     <v-card-text>
                         <span v-for="song in songs" :key="song.id">
@@ -151,6 +151,30 @@
             </v-card>
         </v-dialog>
         <v-dialog
+            v-model="rename_dialog"
+            max-width="400"
+        >
+            <v-card>
+                <v-card-title>
+                    Rename playlist
+                </v-card-title>
+                <v-card-text>
+                    <v-form>
+                        <v-text-field
+                            v-model="rename_name"
+                            label="Name"
+                            required
+                        ></v-text-field>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="changeNameSubmit()" class="primary">
+                        Create playlist
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog
             v-model="create_playlist_dialog"
             max-width="400"
         >
@@ -188,12 +212,15 @@ export default {
             songs_dialog: false,
             songs_temp_dialog: false,
             create_playlist_dialog: false,
+            rename_dialog: false,
             songs: [],
             error_text: '',
             playlist_name: '',
+            rename_name: '',
+            playlist_id: null,
+            total_length: null,
             snackbar: true,
-            temp_playlist_id: null,
-            playlist_id_temp: 1,
+            // playlist_id_temp: 1,
             error_dialog: false,
             remove_song_playlist: '',
             remove_song: []
@@ -201,22 +228,34 @@ export default {
     },
     methods:{
         addToPlaylistTemp(id){
-            let exists = this.$store.state.temp_playlists[id].songs.some(el => el.song_id === this.song.id);
+            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
+            let exists = this.$store.state.temp_playlists[indexOfStevie].songs.some(el => el.song_id === this.song.id);
             if(exists){
                 this.error_text = "This song already exists!";
                 return this.error_dialog = true;
             }
-            this.$store.state.temp_playlists[id].songs.push({song_id: this.song.id, name: this.song.name, length: this.song.length})
-            console.log(this.$store.state.temp_playlists[id])
+            this.$store.state.temp_playlists[indexOfStevie].songs.push({song_id: this.song.id, name: this.song.name, length: this.song.length})
+            console.log(this.$store.state.temp_playlists[indexOfStevie])
         },
-        removeTempSong(id){
-            this.remove_song.push(id);
+        changeName(id){
+            this.playlist_id = id;
+            this.rename_dialog = true;
+        },
+        changeNameSubmit(){
+            this.$store.dispatch('changeName', [this.playlist_id,this.rename_name]).then(() => {
+                this.grabUserPlaylist();
+            });
+            this.rename_dialog = false;
+        },
+        removeTempSong(){
+            // this.remove_song.push(id);
             // console.log(this.$store.state.temp_playlists[this.temp_playlist_id].songs[0].song_id)
 
         },
         removeTempSongEntirely(){
             for(let i of this.remove_song){
-                this.$store.state.temp_playlists[this.temp_playlist_id].songs.splice(this.$store.state.temp_playlists[this.temp_playlist_id].songs.findIndex(({song_id}) => song_id == i), 1);
+                let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === i);
+                this.$store.state.temp_playlists[indexOfStevie].songs.splice(this.$store.state.temp_playlists[this.temp_playlist_id].songs.findIndex(({song_id}) => song_id == i), 1);
             }
             this.songs_temp_dialog = false;
             this.remove_song = [];
@@ -227,16 +266,22 @@ export default {
             });
         },
         viewPlaylistTemp(id){
+            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
             this.temp_playlist_id = id;
             this.remove_song = []
-            this.songs_temp_dialog = !this.songs_temp_dialog;
-            this.songs = this.$store.state.temp_playlists[id]
-            console.log(this.songs)
+            this.songs_temp_dialog = true;
+            this.songs = this.$store.state.temp_playlists[indexOfStevie]
+            let length = this.songs.songs.map(({length}) => length)
+            let sum = length.reduce(function(a, b){
+                return a + b;
+            }, 0);
+            this.total_length = Math.floor(sum / 60) + ':' + ('0' + Math.floor(sum % 60)).slice(-2)
         },
         savePlaylist(id){
             if(this.$store.state.temp_playlists[0].songs.length > 0){
-                this.$store.dispatch('savePlaylist', this.$store.state.temp_playlists[id]).then(() => {
-                    this.$store.state.temp_playlists.splice(id, 1);
+                let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
+                this.$store.dispatch('savePlaylist', this.$store.state.temp_playlists[indexOfStevie]).then(() => {
+                    this.$store.state.temp_playlists.splice(indexOfStevie, 1);
                     this.grabUserPlaylist();
                 }).catch(() => {
                     this.$router.push({ name: 'Login' })
@@ -252,7 +297,8 @@ export default {
           });
       },
       removePlaylistTemp(id){
-          this.$store.state.temp_playlists.splice(id, 1);
+          let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
+          this.$store.state.temp_playlists.splice(indexOfStevie, 1);
       },
       confirmDeleteSong(){
           if(this.remove_song.length === 0){
@@ -301,10 +347,20 @@ export default {
       },
       viewPlaylist(id){
           this.remove_song = []
+
           this.$store.dispatch('viewPlaylist', id).then(response => {
               console.log(response)
               this.songs = response;
-              this.songs_dialog = !this.songs_dialog;
+              let crop = this.songs.map(({song}) => song)
+              let length = []
+              for(let i of crop){
+                  length.push(i[0].length)
+              }
+              let sum = length.reduce(function(a, b){
+                  return a + b;
+              }, 0);
+              this.total_length = Math.floor(sum / 60) + ':' + ('0' + Math.floor(sum % 60)).slice(-2)
+              this.songs_dialog = !this.songs_dialog
           })
       },
       cancelSelectionManuel(){
