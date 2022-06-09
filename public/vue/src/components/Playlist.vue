@@ -1,15 +1,22 @@
 <template>
+
     <div v-on:addSong="addSong(song)">
         <v-btn @click="create_playlist_dialog = !create_playlist_dialog">
             CREATE PLAYLIST
         </v-btn>
+        <v-btn v-if="!song.name" @click="cancelSelectionManuel()">
+            Close playlist
+        </v-btn>
         <h2 class="ma-4">Playlists
         </h2>
-        <v-row class="ml-1">
-            <v-col v-for="list in $store.state.playlists" :key="list.id" cols="12" md="4" sm="6" xs="6">
+        <v-row class="ml-1 mr-1">
+            <v-col v-for="list in $store.state.playlists" :key="list.id" cols="12" md="6" sm="6" xs="6">
                 <v-card>
                     <v-card-title>
                         {{list.name}}
+                        <v-btn v-if="song" @click="changeName(list.id)" text class="orange--text">
+                            Rename
+                        </v-btn>
                         <v-btn v-if="song" @click="addToPlaylist(list.id)" text class="orange--text">
                             Add to playlist
                         </v-btn>
@@ -18,7 +25,7 @@
                         <v-btn @click="viewPlaylist(list.id)" text class="green--text">
                             View playlist
                         </v-btn>
-                        <v-btn text class="red--text">
+                        <v-btn @click="removePlaylist(list.id)" text class="red--text">
                             Delete playlist
                         </v-btn>
                     </v-card-actions>
@@ -26,8 +33,8 @@
             </v-col>
         </v-row>
         <h2 class="ma-4">Unsaved playlists</h2>
-        <v-row class="ml-1">
-            <v-col v-for="list in $store.state.temp_playlists" :key="list.id" cols="12" md="4" sm="6" xs="6">
+        <v-row class="ml-1 mr-1">
+            <v-col v-for="list in $store.state.temp_playlists" :key="list.id" cols="12" md="6" sm="6" xs="6">
                 <v-card>
                     <v-card-title>
                         {{list.name}}
@@ -39,8 +46,11 @@
                         <v-btn @click="viewPlaylistTemp(list.id)" text class="green--text">
                             View playlist
                         </v-btn>
-                        <v-btn text class="red--text">
+                        <v-btn @click="removePlaylistTemp(list.id)" text class="red--text">
                             Delete playlist
+                        </v-btn>
+                        <v-btn @click="savePlaylist(list.id)" text class="blue--text">
+                            Save
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -111,6 +121,7 @@
         <v-snackbar
             v-model="snackbar"
             :timeout="-1"
+            v-if="song.name"
         >
             Selected song: {{ song.name }}
 
@@ -157,8 +168,8 @@
                    </v-form>
                </v-card-text>
                 <v-card-actions>
-                    <v-btn @click="createPlaylist()" color="primary" >
-                        Add to playlist
+                    <v-btn @click="createPlaylist" class="primary">
+                        Create playlist
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -210,6 +221,11 @@ export default {
             this.songs_temp_dialog = false;
             this.remove_song = [];
         },
+        removePlaylist(id){
+            this.$store.dispatch('removePlaylist', id).then(() => {
+                this.grabUserPlaylist();
+            });
+        },
         viewPlaylistTemp(id){
             this.temp_playlist_id = id;
             this.remove_song = []
@@ -217,13 +233,26 @@ export default {
             this.songs = this.$store.state.temp_playlists[id]
             console.log(this.songs)
         },
-
-
-
+        savePlaylist(id){
+            if(this.$store.state.temp_playlists[0].songs.length > 0){
+                this.$store.dispatch('savePlaylist', this.$store.state.temp_playlists[id]).then(() => {
+                    this.$store.state.temp_playlists.splice(id, 1);
+                    this.grabUserPlaylist();
+                }).catch(() => {
+                    this.$router.push({ name: 'Login' })
+                });
+            } else {
+                this.error_text = "This playlist is empty!";
+                return this.error_dialog = true;
+            }
+        },
       grabUserPlaylist(){
           this.$store.dispatch('getPlaylist').then(response => {
               console.log(response)
           });
+      },
+      removePlaylistTemp(id){
+          this.$store.state.temp_playlists.splice(id, 1);
       },
       confirmDeleteSong(){
           if(this.remove_song.length === 0){
@@ -277,6 +306,10 @@ export default {
               this.songs = response;
               this.songs_dialog = !this.songs_dialog;
           })
+      },
+      cancelSelectionManuel(){
+          this.$emit('backToMusic', 2)
+          this.snackbar = false;
       },
       cancelSelection(){
           this.snackbar = false;
