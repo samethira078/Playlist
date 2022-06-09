@@ -62,6 +62,19 @@ export default new Vuex.Store({
               })
           })
       },
+      savePlaylist(context, data){
+          return new Promise((resolve, reject) => {
+              //Post request
+              axios.post('/user/playlist/save', {
+                  playlist: data,
+                  //Result
+              }).then(response => {
+                  resolve(response.data)
+              }).catch(response =>{
+                  reject(response)
+              })
+          })
+      },
       viewPlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -96,6 +109,18 @@ export default new Vuex.Store({
               axios.post('user/remove/song', {
                   songs: data[0],
                   playlist: data[1]
+              }).then(response => {
+                  resolve(response.data)
+              }).catch(response =>{
+                  reject(response)
+              })
+          })
+      },
+      removePlaylist(context, data){
+          return new Promise((resolve, reject) => {
+              //Post request
+              axios.post('user/playlist/remove', {
+                  id: data
               }).then(response => {
                   resolve(response.data)
               }).catch(response =>{

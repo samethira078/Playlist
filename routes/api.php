@@ -26,6 +26,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/user/add/song', [PlaylistController::class, 'addSongToPlaylist']);
     Route::post('/user/remove/song', [PlaylistController::class, 'removeSongFromPlaylist']);
     Route::post('/user/playlist/create', [PlaylistController::class, 'createPlaylist']);
+    Route::post('/user/playlist/save', [PlaylistController::class, 'savePlaylist']);
+    Route::post('/user/playlist/remove', [PlaylistController::class, 'removePlaylist']);
+
 
 });
 
