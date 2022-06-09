@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('songs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('file_name');
-            $table->bigInteger('artist_id');
-            $table->dateTime('release_date');
-            $table->bigInteger('genre_id');
+            $table->foreignId('artist_id');
+            $table->bigInteger('length');
+            $table->bigInteger('release_date');
+            $table->foreignId('genre_id');
         });
     }
 

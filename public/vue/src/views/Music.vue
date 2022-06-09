@@ -1,5 +1,6 @@
 <template>
     <div>
+        <div>
 <!--        LIST ALL GENRES-->
         <v-row class="ma-5">
             <v-col v-for="genre in genres" :key="genre" cols="12" md="4" sm="6" xs="6">
@@ -62,7 +63,7 @@
                 max-width="400"
             >
                 <template>
-                    <v-card>
+                    <v-card >
                         <v-card-title>
                             {{song.name}}
                         </v-card-title>
@@ -73,33 +74,47 @@
                             Genre: {{song.genre.name}}
                         </p>
                         <p class="ml-6">
-                            Length: {{Math.floor(song.length / 60) + ":" + (song.length % 60 ? song.length % 60 : '00')}} minutes
+                            Length: {{Math.floor(song.length / 60) + ':' + ('0' + Math.floor(song.length % 60)).slice(-2)}} minutes
                         </p>
                         <v-card-actions>
                             <v-btn @click="song_info_dialog = !song_info_dialog" text>
                                 Close
+                            </v-btn>
+                            <v-btn color="orange" style="float: right" @click="moveToPlaylist(song)">
+                                Add to playlist
                             </v-btn>
                         </v-card-actions>
                     </v-card>
                 </template>
             </v-dialog>
         </v-row>
+        </div>
+        <v-overlay
+            v-model="playlist_dialog"
+            class="my-overlay"
+        >
+            <playlist v-on:backToMusic="cancelSelectedSong()" :song="song"></playlist>
+        </v-overlay>
     </div>
 </template>
 
 <script>
+import Playlist from "@/components/Playlist";
 export default {
     name: "Music.vue",
+    components: {Playlist},
     data(){
         return{
             media: [],
             genres: [],
             artists: [],
             songs: [],
+            forceRerender: 0,
             song: [],
             artist_dialog: false,
             songs_dialog: false,
             song_info_dialog: false,
+            playlist_dialog: false,
         }
     },
     methods:{
@@ -112,6 +127,12 @@ export default {
               temp_genres = response.map(object => object.genre.name);
               this.genres = [...new Set(temp_genres)];
           })
+      },
+      cancelSelectedSong(){
+          this.artist_dialog =  true;
+          this.songs_dialog = true;
+          this.song_info_dialog = true;
+          this.playlist_dialog = false;
       },
       artists_list(genred){
           this.artists = this.media.filter(({genre}) => genre.name.includes(genred))
@@ -134,7 +155,13 @@ export default {
       song_info(song, artist){
           this.song = this.media.filter(o => o.name == song && o.artist.name == artist)[0]
           this.song_info_dialog = !this.song_info_dialog
-          console.log(this.song)
+      },
+      moveToPlaylist(song){
+          this.$emit('addSong', song);
+          this.playlist_dialog = !this.playlist_dialog;
+          this.artist_dialog =  false;
+          this.songs_dialog = false;
+          this.song_info_dialog = false;
       }
     },
     beforeMount() {
@@ -144,5 +171,10 @@ export default {
 </script>
 
 <style scoped>
-
+.my-overlay >>> .v-overlay__content {
+    margin-left: 100px;
+    width: 100%;
+    height: 100%;
+    background-color: #424242;
+}
 </style>
