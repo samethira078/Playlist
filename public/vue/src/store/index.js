@@ -75,6 +75,20 @@ export default new Vuex.Store({
               })
           })
       },
+      changeName(context, data){
+          return new Promise((resolve, reject) => {
+              //Post request
+              axios.post('/user/playlist/rename', {
+                  id: data[0],
+                  name: data[1]
+                  //Result
+              }).then(response => {
+                  resolve(response.data)
+              }).catch(response =>{
+                  reject(response)
+              })
+          })
+      },
       viewPlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
