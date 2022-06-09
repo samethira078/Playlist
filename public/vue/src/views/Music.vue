@@ -1,5 +1,8 @@
 <template>
     <div>
+        <v-btn @click="playlist_dialog = true">
+            View Playlist
+        </v-btn>
         <div>
 <!--        LIST ALL GENRES-->
         <v-row class="ma-5">
@@ -93,7 +96,7 @@
             v-model="playlist_dialog"
             class="my-overlay"
         >
-            <playlist :key="forceRerender" v-on:backToMusic="cancelSelectedSong()" :song="song"></playlist>
+            <playlist :key="forceRerender" v-on:backToMusic="cancelSelectedSong($event)" :song="song"></playlist>
         </v-overlay>
     </div>
 </template>
@@ -128,10 +131,13 @@ export default {
               this.genres = [...new Set(temp_genres)];
           })
       },
-      cancelSelectedSong(){
-          this.artist_dialog =  true;
-          this.songs_dialog = true;
-          this.song_info_dialog = true;
+      cancelSelectedSong(num){
+        if(num !== 2){
+            this.artist_dialog =  true;
+            this.songs_dialog = true;
+            this.song_info_dialog = true;
+        }
+
           this.playlist_dialog = false;
       },
       artists_list(genred){
