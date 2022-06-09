@@ -59,8 +59,8 @@ export default {
     methods: {
         register_user(){
             this.$store.dispatch('register', [this.name, this.password, this.password_confirm]).
-            then(response => {
-                console.log(response)
+            then(() => {
+                this.$router.push({ name: 'Login' })
             }).
             catch(response => {
                 //Error
