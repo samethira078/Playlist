@@ -228,14 +228,13 @@ export default {
     },
     methods:{
         addToPlaylistTemp(id){
+            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
             let exists = this.$store.state.temp_playlists[indexOfStevie].songs.some(el => el.song_id === this.song.id);
             if(exists){
                 this.error_text = "This song already exists!";
                 return this.error_dialog = true;
             }
-            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
-            this.$store.state.temp_playlists[indexOfStevie].songs.push({song_id: this.song.id, name: this.song.name, length: this.song.length})
-            console.log(this.$store.state.temp_playlists[indexOfStevie])
+            this.$store.commit('addSongToTempPlaylist', [this.song, id])
         },
         changeName(id){
             this.playlist_id = id;
