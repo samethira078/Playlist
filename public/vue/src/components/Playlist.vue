@@ -305,8 +305,7 @@ export default {
         },
       //  GRAB USER PLAYLIST
       grabUserPlaylist(){
-          this.$store.dispatch('getPlaylist').then(response => {
-              console.log(response)
+          this.$store.dispatch('getPlaylist').then(() => {
           });
       },
       //  REMOVE TEMPORARILY PLAYLIST
@@ -318,8 +317,7 @@ export default {
           if(this.remove_song.length === 0){
               return this.songs_dialog = false;
           }
-          this.$store.dispatch('removeSongs', [this.remove_song, this.remove_song_playlist]).then(response => {
-              console.log(response)
+          this.$store.dispatch('removeSongs', [this.remove_song, this.remove_song_playlist]).then(() => {
               this.songs_dialog = false;
           });
       },
@@ -369,7 +367,6 @@ export default {
           this.remove_song = []
 
           this.$store.dispatch('viewPlaylist', id).then(response => {
-              console.log(response)
               this.songs = response;
               let crop = this.songs.map(({song}) => song)
               let length = []

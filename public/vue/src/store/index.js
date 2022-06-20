@@ -50,13 +50,11 @@ export default new Vuex.Store({
       },
       //REMOVE SONG OF TEMPLIST ON RELOAD
       removeTempPlaylistSongs(state, data){
-          console.log(state.temp_playlists[data[0]].songs)
-          console.log(data[1])
-          // let index = state.temp_playlists.findIndex(i => i.id === data[0]);
           for(const song of data[1]){
-             state.temp_playlists = state.temp_playlists[data[0]].songs.filter(selected => selected.song_id !== song);
+              let index = state.temp_playlists[data[0]].songs.findIndex(i => i.song_id === song);
+              state.temp_playlists[data[0]].songs.splice(index, 1)
           }
-          console.log(state.temp_playlists)
+          console.log(state.temp_playlists[data[0]])
       }
   },
   actions: {
