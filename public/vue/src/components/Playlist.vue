@@ -247,15 +247,17 @@ export default {
             });
             this.rename_dialog = false;
         },
-        removeTempSong(){
-            // this.remove_song.push(id);
-            // console.log(this.$store.state.temp_playlists[this.temp_playlist_id].songs[0].song_id)
+        removeTempSong(id){
+            this.remove_song.push(id);
+            console.log(this.$store.state.temp_playlists[this.temp_playlist_id])
 
         },
         removeTempSongEntirely(){
             for(let i of this.remove_song){
-                let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === i);
-                this.$store.state.temp_playlists[indexOfStevie].songs.splice(this.$store.state.temp_playlists[this.temp_playlist_id].songs.findIndex(({song_id}) => song_id == i), 1);
+                console.log(this.$store.state.temp_playlists[0].songs)
+                let indexOfStevie = this.$store.state.temp_playlists.findIndex(l => l.songs.song_id === i);
+                console.log(indexOfStevie);
+                // this.$store.state.temp_playlists[indexOfStevie].songs.splice(this.$store.state.temp_playlists[this.temp_playlist_id].songs.findIndex(({song_id}) => song_id == i), 1);
             }
             this.songs_temp_dialog = false;
             this.remove_song = [];
@@ -297,6 +299,7 @@ export default {
           });
       },
       removePlaylistTemp(id){
+          console.log(this.$store.state.temp_playlists)
           let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
           this.$store.state.temp_playlists.splice(indexOfStevie, 1);
       },
@@ -317,8 +320,8 @@ export default {
                     this.error_text = "This playlist already exists!";
                     return this.error_dialog = true;
                 }
-                this.$store.state.temp_playlists.push({id: this.$store.state.playlist_id_temp,name: this.playlist_name, 'songs': []})
-                this.$store.state.playlist_id_temp = this.$store.state.playlist_id_temp + 1;
+                this.$store.commit('createTempPlaylist', this.playlist_name)
+
                 this.create_playlist_dialog = false;
             }).catch(() => {
                 this.error_text = "This playlist already exists!";
@@ -330,8 +333,7 @@ export default {
                 this.error_text = "This playlist already exists!";
                 return this.error_dialog = true;
             }
-            this.$store.state.temp_playlists.push({id: this.$store.state.playlist_id_temp,name: this.playlist_name, 'songs': []})
-            this.$store.state.playlist_id_temp = this.$store.state.playlist_id_temp + 1;
+            this.$store.commit('createTempPlaylist', this.playlist_name)
             this.create_playlist_dialog = false;
         }
       },

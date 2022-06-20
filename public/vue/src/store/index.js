@@ -10,12 +10,16 @@ axios.defaults.baseURL = 'http://juke.nl/api/'
 axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
 
 export default new Vuex.Store({
+    plugins: [createPersistedState({
+        storage: window.sessionStorage,
+    })],
   state: {
       //Token
       token: localStorage.getItem('token'),
       temp_playlists: [],
       playlists: [],
       playlist_id_temp: 0,
+
   },
   mutations: {
       saveToken(state, token) {
@@ -26,6 +30,10 @@ export default new Vuex.Store({
           //Save token
           state.playlists = data;
       },
+      createTempPlaylist(state, data){
+          state.temp_playlists.push({id: state.playlist_id_temp,name: data, 'songs': []})
+          state.playlist_id_temp +=1;
+      }
   },
   actions: {
       //User Login
@@ -171,7 +179,4 @@ export default new Vuex.Store({
   },
   modules: {
   },
-    plugins: [createPersistedState({
-        storage: window.sessionStorage,
-    })],
 })
