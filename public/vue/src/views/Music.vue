@@ -121,6 +121,7 @@ export default {
         }
     },
     methods:{
+      //  PROMISE
       getSongs(){
           //Grab all songs merged with genres and artists
           this.$store.dispatch('getSongs').then(response => {
@@ -131,6 +132,7 @@ export default {
               this.genres = [...new Set(temp_genres)];
           })
       },
+      //  CANCEL SELECTED SONG PROP
       cancelSelectedSong(num){
         if(num !== 2){
             this.artist_dialog =  true;
@@ -141,6 +143,7 @@ export default {
 
           this.playlist_dialog = false;
       },
+      //  DISPLAY ARTISTS
       artists_list(genred){
           this.artists = this.media.filter(({genre}) => genre.name.includes(genred))
           let filtered = []
@@ -155,14 +158,17 @@ export default {
           this.artists = filtered;
           this.artist_dialog = !this.artist_dialog;
       },
+      //  SELECTED SONG OF PLAYLIST
       selectedSong(artist_id){
             this.songs = this.artists.find(x => x.artist_id == artist_id);
             this.songs_dialog = !this.songs_dialog;
         },
+      //  SONG INFO
       song_info(song, artist){
           this.song = this.media.filter(o => o.name == song && o.artist.name == artist)[0]
           this.song_info_dialog = !this.song_info_dialog
       },
+      //  SELECTED SONG SELECTION
       moveToPlaylist(song){
           this.forceRerender += 1;
           this.$emit('addSong', song);

@@ -5,11 +5,12 @@ import createPersistedState from 'vuex-persistedstate'
 
 
 Vue.use(Vuex)
-
+//AXIOS DEFAULT ROUTES
 axios.defaults.baseURL = 'http://juke.nl/api/'
 axios.defaults.headers.common["Authorization"] = "Bearer " + localStorage.getItem("token");
 
 export default new Vuex.Store({
+    //SAVE VUEX STATES IN SESSION STORAGE
     plugins: [createPersistedState({
         storage: window.sessionStorage,
     })],
@@ -26,23 +27,37 @@ export default new Vuex.Store({
           //Save token
           localStorage.setItem('token', token.token);
       },
+      //SAVE ON RELOAD
       savePlaylist(state, data) {
           //Save token
           state.playlists = data;
       },
+      //SAVE ON CREATION ON RELOAD
       createTempPlaylist(state, data){
           state.temp_playlists.push({id: state.playlist_id_temp,name: data, 'songs': []})
           state.playlist_id_temp +=1;
       },
+      //REMOVE TEMP PLAYLIST ON RELOAD
       removeTempPlaylist(state, data){
           let index = state.temp_playlists.findIndex(i => i.id === data);
           state.temp_playlists.splice(index, 1);
       },
+      //ADD SONG ON RELOAD
       addSongToTempPlaylist(state, data){
           console.log(data)
           let index = state.temp_playlists.findIndex(i => i.id === data[1]);
           state.temp_playlists[index].songs.push({song_id: data[0].id, name: data[0].name, length: data[0].length})
       },
+      //REMOVE SONG OF TEMPLIST ON RELOAD
+      removeTempPlaylistSongs(state, data){
+          console.log(state.temp_playlists[data[0]].songs)
+          console.log(data[1])
+          // let index = state.temp_playlists.findIndex(i => i.id === data[0]);
+          for(const song of data[1]){
+             state.temp_playlists = state.temp_playlists[data[0]].songs.filter(selected => selected.song_id !== song);
+          }
+          console.log(state.temp_playlists)
+      }
   },
   actions: {
       //User Login
@@ -61,6 +76,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //GRAB SONGS FROM DB
       getSongs(){
         return new Promise((resolve, reject) => {
             axios.get('songs/all').then(response => {resolve(response.data)
@@ -69,6 +85,7 @@ export default new Vuex.Store({
             })
         })
       },
+      //GET SPECIFIC PLAYLIST OF USER
       getPlaylist(context){
           return new Promise((resolve, reject) => {
               axios.get('user/playlist').then(response => {
@@ -79,6 +96,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //DATA PLAYLIST
       savePlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -92,6 +110,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //CHANGE NAME OF PLAYLIST
       changeName(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -106,6 +125,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //VIEW PLAYLISTS
       viewPlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -119,6 +139,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //REGISTER AN USER
       register(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -134,6 +155,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //REMOVE A SONG FROM A PLAYLIST
       removeSongs(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -147,6 +169,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //REMOVE PLAYLIST
       removePlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -159,6 +182,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //CREATE PLAYLIST TO DB
       createPlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request
@@ -171,6 +195,7 @@ export default new Vuex.Store({
               })
           })
       },
+      //ADD SONGS TO PLAYLIST
       addToPlaylist(context, data){
           return new Promise((resolve, reject) => {
               //Post request

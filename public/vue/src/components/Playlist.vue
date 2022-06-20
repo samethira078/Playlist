@@ -204,6 +204,7 @@
 <script>
 export default {
     name: "Playlist",
+    // SELECTED SONG AS PROP
     props: {
       song:Object
     },
@@ -218,6 +219,7 @@ export default {
             playlist_name: '',
             rename_name: '',
             playlist_id: null,
+            temp_playlist_id: null,
             total_length: null,
             snackbar: true,
             // playlist_id_temp: 1,
@@ -227,57 +229,66 @@ export default {
         }
     },
     methods:{
+        //ADD TO TEMP PLAYLIST
         addToPlaylistTemp(id){
+            //INDEX OF PLAYLIST
             let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
+            //CHECK IF EXISTS ALREADY
             let exists = this.$store.state.temp_playlists[indexOfStevie].songs.some(el => el.song_id === this.song.id);
+            //RETURN IF EXISTS
             if(exists){
                 this.error_text = "This song already exists!";
                 return this.error_dialog = true;
             }
             this.$store.commit('addSongToTempPlaylist', [this.song, id])
         },
+        //DIALOG CHANGE PLAYLIST NAME
         changeName(id){
             this.playlist_id = id;
             this.rename_dialog = true;
         },
+        //CHANGE PLAYLIST
         changeNameSubmit(){
+            //POST REQUEST TO CHANGE
             this.$store.dispatch('changeName', [this.playlist_id,this.rename_name]).then(() => {
                 this.grabUserPlaylist();
             });
+            //DISABLE DIALOG
             this.rename_dialog = false;
         },
+        //ADD SELECTED SONGS TO REMOVE IN ARRAY
         removeTempSong(id){
             this.remove_song.push(id);
-            console.log(this.$store.state.temp_playlists[this.temp_playlist_id])
-
         },
+        //REMOVE TEMP SONG ENTIRELY
         removeTempSongEntirely(){
-            for(let i of this.remove_song){
-                console.log(this.$store.state.temp_playlists[0].songs)
-                let indexOfStevie = this.$store.state.temp_playlists.findIndex(l => l.songs.song_id === i);
-                console.log(indexOfStevie);
-                // this.$store.state.temp_playlists[indexOfStevie].songs.splice(this.$store.state.temp_playlists[this.temp_playlist_id].songs.findIndex(({song_id}) => song_id == i), 1);
-            }
+            this.$store.commit('removeTempPlaylistSongs', [this.temp_playlist_id, this.remove_song])
             this.songs_temp_dialog = false;
             this.remove_song = [];
         },
+        //REMOVE PLAYLIST FROM FB
         removePlaylist(id){
             this.$store.dispatch('removePlaylist', id).then(() => {
                 this.grabUserPlaylist();
             });
         },
+        //VIEW PLAYLIST INFO
         viewPlaylistTemp(id){
             let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
-            this.temp_playlist_id = id;
+            this.temp_playlist_id = indexOfStevie
             this.remove_song = []
             this.songs_temp_dialog = true;
             this.songs = this.$store.state.temp_playlists[indexOfStevie]
+            //MAP LENGTH TO ARRAY
             let length = this.songs.songs.map(({length}) => length)
+            //CALC ALL OPTELLEN
             let sum = length.reduce(function(a, b){
                 return a + b;
             }, 0);
+            //SHOW AS TIME AND SECONDS
             this.total_length = Math.floor(sum / 60) + ':' + ('0' + Math.floor(sum % 60)).slice(-2)
         },
+        //SAVE PLAYLIST
         savePlaylist(id){
             if(this.$store.state.temp_playlists[0].songs.length > 0){
                 let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
@@ -292,14 +303,17 @@ export default {
                 return this.error_dialog = true;
             }
         },
+      //  GRAB USER PLAYLIST
       grabUserPlaylist(){
           this.$store.dispatch('getPlaylist').then(response => {
               console.log(response)
           });
       },
+      //  REMOVE TEMPORARILY PLAYLIST
       removePlaylistTemp(id){
           this.$store.commit('removeTempPlaylist', id)
       },
+      //  CONFIRM REMOVING SONG FROM DB OF PLAYLIST
       confirmDeleteSong(){
           if(this.remove_song.length === 0){
               return this.songs_dialog = false;
@@ -326,26 +340,31 @@ export default {
                 this.error_dialog = true;
             });
         } else {
+            //IF EXISTS CHECK PLAYLIST
             let exists = this.$store.state.temp_playlists.some(el => el.name === this.playlist_name);
             let exists_real = this.$store.state.playlists.some(el => el.name === this.playlist_name);
             if(exists || exists_real){
                 this.error_text = "This playlist already exists!";
                 return this.error_dialog = true;
             }
+            //CREATE TEMPORARLY PLAYLIST
             this.$store.commit('createTempPlaylist', this.playlist_name)
             this.create_playlist_dialog = false;
         }
       },
+      //  REMOVE SONG
       removeSong(id, playlist){
           this.remove_song_playlist = playlist
           this.remove_song.push(id);
       },
+      //  ADD TO PLAYLIST
       addToPlaylist(id){
           this.$store.dispatch('addToPlaylist', [id, this.song.id]).catch(() => {
               this.error_text = "This song already exists in the playlist!";
               this.error_dialog = true;
           })
       },
+      //  VIEW PLAYLIST
       viewPlaylist(id){
           this.remove_song = []
 
@@ -354,26 +373,31 @@ export default {
               this.songs = response;
               let crop = this.songs.map(({song}) => song)
               let length = []
+              //MINUTES TO ARRAY
               for(let i of crop){
                   length.push(i[0].length)
               }
               let sum = length.reduce(function(a, b){
                   return a + b;
               }, 0);
+              //DISPLAY MM:SS
               this.total_length = Math.floor(sum / 60) + ':' + ('0' + Math.floor(sum % 60)).slice(-2)
               this.songs_dialog = !this.songs_dialog
           })
       },
+      // CANCEL PROP SELECTED
       cancelSelectionManuel(){
           this.$emit('backToMusic', 2)
           this.snackbar = false;
       },
+      //  CANCEL PROP SELECTED
       cancelSelection(){
           this.snackbar = false;
           this.song = [];
           this.$emit('backToMusic', true)
       }
     },
+    // BEFORE LOADING
     beforeMount() {
         this.$emit('changeNavbar');
         this.songs_dialog =  false;
