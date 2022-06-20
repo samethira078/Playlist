@@ -228,12 +228,12 @@ export default {
     },
     methods:{
         addToPlaylistTemp(id){
-            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
             let exists = this.$store.state.temp_playlists[indexOfStevie].songs.some(el => el.song_id === this.song.id);
             if(exists){
                 this.error_text = "This song already exists!";
                 return this.error_dialog = true;
             }
+            let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
             this.$store.state.temp_playlists[indexOfStevie].songs.push({song_id: this.song.id, name: this.song.name, length: this.song.length})
             console.log(this.$store.state.temp_playlists[indexOfStevie])
         },
@@ -299,9 +299,7 @@ export default {
           });
       },
       removePlaylistTemp(id){
-          console.log(this.$store.state.temp_playlists)
-          let indexOfStevie = this.$store.state.temp_playlists.findIndex(i => i.id === id);
-          this.$store.state.temp_playlists.splice(indexOfStevie, 1);
+          this.$store.commit('removeTempPlaylist', id)
       },
       confirmDeleteSong(){
           if(this.remove_song.length === 0){
@@ -312,6 +310,7 @@ export default {
               this.songs_dialog = false;
           });
       },
+      //  Creating a playlist
       createPlaylist(){
         if(this.$store.state.token){
             this.$store.dispatch('createPlaylist', this.playlist_name).then(() => {
@@ -329,7 +328,8 @@ export default {
             });
         } else {
             let exists = this.$store.state.temp_playlists.some(el => el.name === this.playlist_name);
-            if(exists){
+            let exists_real = this.$store.state.playlists.some(el => el.name === this.playlist_name);
+            if(exists || exists_real){
                 this.error_text = "This playlist already exists!";
                 return this.error_dialog = true;
             }

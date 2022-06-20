@@ -33,7 +33,12 @@ export default new Vuex.Store({
       createTempPlaylist(state, data){
           state.temp_playlists.push({id: state.playlist_id_temp,name: data, 'songs': []})
           state.playlist_id_temp +=1;
-      }
+      },
+      removeTempPlaylist(state, data){
+          let index = state.temp_playlists.findIndex(i => i.id === data);
+          state.temp_playlists.splice(index, 1);
+      },
+
   },
   actions: {
       //User Login
