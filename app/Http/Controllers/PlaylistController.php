@@ -10,15 +10,16 @@ use App\Models\User;
 
 class PlaylistController extends Controller
 {
+//    Grab playlist of logged in user by ID
     public function getPlaylist(){
         return Playlist::where('user_id', '=', auth()->user()->id)->get();
     }
+//    Grab selected playlist songs of logged in user by playlist ID and user ID
     public function getPlaylistSongs(Request $request){
-//        echo $request->id;
         return PlaylistSong::with(['song', 'playlist'])->whereHas('playlist', function($q) {
             $q->where('user_id', '=', auth()->user()->id);})->where('playlist_id', '=', $request->id)->get();
     }
-
+//    Assign song to playlist, check if song exists in playlist
     public function addSongToPlaylist(Request $request){
         $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
             ->where('id', '=', $request->playlist_id)
@@ -47,6 +48,7 @@ class PlaylistController extends Controller
             'message' => 'Added'
         ],200);
     }
+//    Remove song from playlist, check user ID
     public function removeSongFromPlaylist(Request $request){
         echo $request;
         $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
@@ -61,6 +63,7 @@ class PlaylistController extends Controller
             PlaylistSong::destroy($song);
         }
     }
+//    Create a playlist, check if playlist exists by name
     public function createPlaylist(Request $request){
         $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
             ->where('name', '=', $request->name)
@@ -71,6 +74,7 @@ class PlaylistController extends Controller
             ],403);
         }
     }
+//     Save temporarly playlist to database playlist assigned to userID
     public function savePlaylist(Request $request){
         if(is_numeric(auth()->user()->id)){
             $playlist = new Playlist;
@@ -88,6 +92,7 @@ class PlaylistController extends Controller
 //        echo $request;
 
     }
+//    Remove a playlist of a user
     public function removePlaylist(Request $request){
         $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
             ->where('id', '=', $request->id)
@@ -96,6 +101,7 @@ class PlaylistController extends Controller
            Playlist::destroy($request->id);
         }
     }
+//    Rename an existing playlist
     public function renamePlaylist(Request $request){
         echo $request;
         $playlist_exists = Playlist::where('user_id', '=', auth()->user()->id)
